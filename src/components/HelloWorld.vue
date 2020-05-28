@@ -72,6 +72,7 @@ export default {
   methods: {
     getLoadingMessage: function() {
       let rand = Math.floor(Math.random() * this.loadingMessages.length);
+      console.log(process.env.VUE_APP_OPENCAGE);
       return this.loadingMessages[rand];
     },
     
