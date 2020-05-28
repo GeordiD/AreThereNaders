@@ -14,9 +14,11 @@
     <div v-else> 
       <div id="are-there" >
         <h1>{{areThere}}</h1>
-        <div v-if="!isWarning && !isWatch">
-          <br/>
-          <h4>{{headline}}</h4>
+        <div>
+          <div v-if="headline">
+            <br/>
+            <h4 >{{headline}}</h4>
+          </div>
           <p>{{description}}</p>
         </div>
       </div>
@@ -28,7 +30,7 @@
 import axios from 'axios';
 
 export default {
-  name: 'HelloWorld',
+  name: 'AreThereNaders',
   data() {
     return {
       isWarning: false,
@@ -49,7 +51,9 @@ export default {
         'Calling memaw',
         'Burning my essential oils',
         'Reading the tarrot cards'
-      ]
+      ],
+      startTime: null,
+      waitTime: 750 // ms
     }
   },
   computed: {
@@ -61,7 +65,7 @@ export default {
         return "Maybe.";
       }
       else {
-        return "No.";
+        return "Nope.";
       }
     }
   },
@@ -70,6 +74,7 @@ export default {
       let rand = Math.floor(Math.random() * this.loadingMessages.length);
       return this.loadingMessages[rand];
     },
+    
     checkIfNaders(long, lat) {
       axios.get('https://api.weather.gov/alerts?event=Tornado Warning&active=true&point=' + lat + ',' + long)
       .then((res) => {
@@ -78,7 +83,7 @@ export default {
             this.isWatch = false;
             this.headline = res.data.features[0].properties.headline;
             this.description = res.data.features[0].properties.description;
-            this.isLoading = false;
+            this.doneLoading();
           } else {
             axios.get('https://api.weather.gov/alerts?event=Tornado Watcg&active=true&point=' + lat + ',' + long)
               .then((res) => {
@@ -87,6 +92,8 @@ export default {
                   this.isWatch = true;
                   this.headline = res.data.features[0].properties.headline;
                   this.description = res.data.features[0].properties.description;
+                } else {
+                  this.description = 'No tornados in your area.'
                 }
               })
               .catch(err => {
@@ -94,7 +101,7 @@ export default {
                 console.error(err);
               })
               .finally(() => {
-                this.isLoading = false;
+                this.doneLoading();
               })
           }
         })
@@ -102,11 +109,23 @@ export default {
         this.error = true;
         console.error(err);
       });
+    },
+
+    doneLoading() {
+      let elapsedTime = new Date().getTime() - this.startTime;
+      
+      if(this.waitTime > elapsedTime) {
+        setTimeout(() => { this.isLoading = false }, this.waitTime - elapsedTime);
+      } else {
+        this.isLoading = false;
+      }
+
     }
   },
   mounted() {
     let long = -101.51;
     let lat = 33.04;
+    this.startTime = new Date().getTime();
 
     if(navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -122,15 +141,14 @@ export default {
         }
       )
     }
-
-     
   }
 }
-
-
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+h1 {
+  font-size: 50px;
+}
 
 </style>
