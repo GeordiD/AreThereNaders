@@ -1,6 +1,6 @@
 <template>
   <form @submit.prevent="onSubmit" class="container-fluid mx-auto my-3">
-    <p>Skynet is busy and can't locate you, we'll have to do this the old fashioned way... --{{apiKey}}--</p>
+    <p>Skynet is busy and can't locate you, we'll have to do this the old fashioned way...</p>
     <div v-if="submitStatus === 'PENDING'">
         <div class="spinner-border" role="status">
             <span class="sr-only">Loading...</span>
