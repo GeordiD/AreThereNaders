@@ -1,24 +1,7 @@
-# are-there-naders
+# Are There Naders
 
-## Project setup
-```
-npm install
-```
+AreThereNaders.com is a website that I thought of in the middle of the night during a surprise Oklahoma thunderstorm. Abruptly awoken by a loud thunderclap, I only had one simple question and needed a simple answer: there 'naders* out there? Alas, all these weather websites try to distract me with pretty colors and fancy words like "forecast" and "radar".  If I wanted my simple answer, I'd have to create a simple website.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+AreThereNaders.com polls the National Weather Service (sorry, US only for now...) for tornado watches and warnings in your area and tells you if that rain outside is something to be concerned about or not. If you have any questions, feedback, or problems, please create an issue for this repo and I'll get back with you.
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+\* 'naders is short for "tornados". Like with all things you become very aquinted with, tornados have earned their petname after many years of living in the midwest.
