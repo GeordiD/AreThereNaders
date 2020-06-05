@@ -183,15 +183,29 @@ export default {
               let pos = response.results[0].bounds.northeast;
               this.submitStatus = 'GOOD';
 
-                console.log(response);
+              this.$ga.event({
+                eventCategory: 'geocode',
+                eventAction: 'good'
+              });
+
               this.$emit('long-lat', pos.lng, pos.lat, response.results[0].formatted);
           } else {
               this.submitStatus = 'BAD';
+
+              this.$ga.event({
+                eventCategory: 'geocode',
+                eventAction: 'bad'
+              });
           }
         })
         .catch(err => {
           console.error(err);
           this.submitStatus = "BAD";
+
+          this.$ga.event({
+                eventCategory: 'geocode',
+                eventAction: 'error'
+              });
         });
     },
     isNumber(evt) {

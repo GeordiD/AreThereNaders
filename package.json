@@ -17,6 +17,7 @@
     "popper.js": "^1.16.1",
     "register-service-worker": "^1.7.1",
     "vue": "^2.6.11",
+    "vue-analytics": "^5.22.1",
     "vue-router": "^3.1.6",
     "vuelidate": "^0.7.5"
   },
