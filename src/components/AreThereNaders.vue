@@ -27,7 +27,7 @@
         <br />
         <i>
           Not your address?
-          <a href="#" v-on:click='resetAddress()'>Try entering it again</a>
+          <a href="#" v-on:click="resetAddress()">Try entering it again</a>
         </i>
       </div>
     </div>
@@ -90,13 +90,23 @@ export default {
         position => {
           long = position.coords.longitude;
           lat = position.coords.latitude;
-          console.log(lat + "," + long);
+
+          this.$ga.event({
+            eventCategory: "geolocation",
+            eventAction: "has"
+          });
+
           this.checkIfNaders(long, lat);
         },
         () => {
           // we'll have to get it some other way
           this.hasLongLat = false;
           this.isLoading = false;
+
+          this.$ga.event({
+            eventCategory: "geolocation",
+            eventAction: "no"
+          });
         }
       );
     }
@@ -134,6 +144,11 @@ export default {
             this.headline = res.data.features[0].properties.headline;
             this.description = res.data.features[0].properties.description;
             this.doneLoading();
+
+            this.$ga.event({
+              eventCategory: "results",
+              eventAction: "warning"
+            });
           } else {
             axios
               .get(
@@ -153,8 +168,18 @@ export default {
                   this.headline = res.data.features[0].properties.headline;
                   this.description =
                     res.data.features[0].properties.description;
+
+                  this.$ga.event({
+                    eventCategory: "results",
+                    eventAction: "watch"
+                  });
                 } else {
                   this.description = "No tornados in your area.";
+
+                  this.$ga.event({
+                    eventCategory: "results",
+                    eventAction: "no tornado"
+                  });
                 }
               })
               .catch(err => {
@@ -207,5 +232,4 @@ h1 {
   width: 100%;
   height: 5rem;
 }
-
 </style>
