@@ -22,7 +22,7 @@
     </div>
     <div class="footer" v-if="formattedAddress && !isLoading">
       <div>
-        Using address:
+        Using address: <span v-if="!isWatch">tessstttt2</span> 
         <b>{{formattedAddress}}</b>
         <br />
         <i>
