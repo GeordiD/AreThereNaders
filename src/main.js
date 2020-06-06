@@ -15,7 +15,7 @@ Vue.use(VueAnalytics, {
   id: 'UA-71023042-2',
   router,
   debug: {
-    enabled: !isProd
+    enabled: false //!isProd
   }
 })
 

@@ -2,7 +2,7 @@
   <div class="page-container">
     <div class="pt-3 page-content">
       <div v-if="error">Well, something broke. I'll try and fix it hang tight.</div>
-      <div v-else-if="isLoading">{{getLoadingMessage()}}</div>
+      <div v-else-if="isLoading">{{loadingMessage}}</div>
       <div v-else>
         <div id="are-there" v-if="hasLongLat">
           <h1>{{areThere}}</h1>
@@ -20,14 +20,21 @@
         </div>
       </div>
     </div>
-    <div class="footer" v-if="formattedAddress">
+    <div class="footer" v-if="formattedAddress && !isLoading">
       <div>
         Using address:
         <b>{{formattedAddress}}</b>
         <br />
         <i>
           Not your address?
-          <a href="#" v-on:click="resetAddress()">Try entering it again</a>
+          <a href="#" v-on:click="resetAddress()">
+            <span v-if="allowGeolocation">Try entering it manually</span>
+            <span v-else>Try entering it again</span>
+          </a>
+          <span v-if="allowGeolocation && !usingGeolocation">
+             - 
+            <a href="#" v-on:click="pullGeolocation()">Find me</a>
+          </span>
         </i>
       </div>
     </div>
@@ -37,6 +44,7 @@
 <script>
 import axios from "axios";
 import GeocodingForm from "./GeocodingForm.vue";
+import * as opencage from "opencage-api-client";
 
 export default {
   name: "AreThereNaders",
@@ -51,8 +59,11 @@ export default {
       description: null,
       formattedAddress: null,
       error: false,
+      allowGeolocation: true,
+      usingGeolocation: true,
       hasLongLat: true,
       isLoading: true,
+      loadingMessage: "loading...",
       loadingMessages: [
         "Hacking NASA",
         "Polling the guvment",
@@ -81,45 +92,57 @@ export default {
     }
   },
   mounted() {
-    let long = -101.51;
-    let lat = 33.04;
-    this.startTime = new Date().getTime();
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          long = position.coords.longitude;
-          lat = position.coords.latitude;
-
-          this.$ga.event({
-            eventCategory: "geolocation",
-            eventAction: "usingGeolocation",
-            eventValue: "usingGeolocation"
-          });
-
-          this.checkIfNaders(long, lat);
-        },
-        () => {
-          // we'll have to get it some other way
-          this.hasLongLat = false;
-          this.isLoading = false;
-
-          this.$ga.event({
-            eventCategory: "geolocation",
-            eventAction: "notUsingGeoLocation",
-            eventValue: "notUsingGeoLocation"
-          });
-        }
-      );
-    }
+      this.pullGeolocation();
   },
   methods: {
+    pullGeolocation() {
+      let long = 0;
+      let lat = 0;
+      this.startTime = new Date();
+
+      this.isLoading = true;
+      this.getLoadingMessage();
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            this.$ga.event({
+              eventCategory: "geolocation",
+              eventAction: "usingGeolocation",
+              eventValue: "usingGeolocation"
+            });
+
+            long = position.coords.longitude;
+            lat = position.coords.latitude;
+            // this.usingGeolocation = true;
+            // this.allowGeolocation = true;
+
+            this.reverseGeocode(long, lat);
+            this.checkIfNaders(long, lat);
+          },
+          () => {
+            // we'll have to get it some other way
+            this.usingGeolocation = this.allowGeolocation = this.hasLongLat = false;
+            this.isLoading = false;
+
+            this.$ga.event({
+              eventCategory: "geolocation",
+              eventAction: "notUsingGeoLocation",
+              eventValue: "notUsingGeoLocation"
+            });
+          }
+        );
+      }
+    },
     resetAddress() {
       this.hasLongLat = false;
       this.formattedAddress = null;
     },
+
     getLongLat(long, lat, forAddress) {
+      this.getLoadingMessage();
       this.isLoading = true;
+      this.usingGeolocation = false;
       this.hasLongLat = true;
       this.formattedAddress = forAddress;
       this.checkIfNaders(long, lat);
@@ -127,7 +150,7 @@ export default {
 
     getLoadingMessage() {
       let rand = Math.floor(Math.random() * this.loadingMessages.length);
-      return this.loadingMessages[rand];
+      this.loadingMessage = this.loadingMessages[rand];
     },
 
     checkIfNaders(long, lat) {
@@ -199,6 +222,35 @@ export default {
           this.error = true;
           console.error(err);
         });
+    },
+
+    reverseGeocode(long, lat) {
+      let apiKey = process.env.VUE_APP_OPENCAGE;
+      let query = encodeURI(lat + "+" + long);
+
+      axios.get(`https://api.opencagedata.com/geocode/v1/json?key=${apiKey}&q=${query}`)
+        .then((response) => {
+          response = response.data;
+          if(response && response.results && response.results.length > 0 && response.results[0].formatted) {
+              this.formattedAddress = response.results[0].formatted;
+
+              this.$ga.event({
+                eventCategory: 'reverseGeocode',
+                eventAction: 'good',
+                eventValue: 'good'
+              });
+
+              
+          } else {
+              console.error("Couldn't get reverseGeocoding");
+
+              this.$ga.event({
+                eventCategory: 'reverseGeocode',
+                eventAction: 'bad',
+                eventValue: 'bad'
+              });
+          }
+        })
     },
 
     doneLoading() {
