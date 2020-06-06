@@ -185,7 +185,8 @@ export default {
 
               this.$ga.event({
                 eventCategory: 'geocode',
-                eventAction: 'good'
+                eventAction: 'good',
+                eventValue: 'good'
               });
 
               this.$emit('long-lat', pos.lng, pos.lat, response.results[0].formatted);
@@ -194,7 +195,8 @@ export default {
 
               this.$ga.event({
                 eventCategory: 'geocode',
-                eventAction: 'bad'
+                eventAction: 'bad',
+                eventValue: 'bad'
               });
           }
         })
@@ -204,7 +206,8 @@ export default {
 
           this.$ga.event({
                 eventCategory: 'geocode',
-                eventAction: 'error'
+                eventAction: 'error',
+                eventValue: 'error'
               });
         });
     },
