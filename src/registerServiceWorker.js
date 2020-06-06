@@ -1,5 +1,8 @@
 /* eslint-disable no-console */
 
+// add to package.json / devDependencies
+// "@vue/cli-plugin-pwa": "~4.3.0",
+
 import { register } from 'register-service-worker'
 
 if (process.env.NODE_ENV === 'production') {
