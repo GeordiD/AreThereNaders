@@ -129,7 +129,6 @@ export default {
     },
 
     checkIfNaders(long, lat) {
-      console.log("check if naders: " + long + ", " + lat);
       axios
         .get(
           "https://api.weather.gov/alerts?event=Tornado Warning&active=true&point=" +
