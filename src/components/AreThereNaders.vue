@@ -93,7 +93,8 @@ export default {
 
           this.$ga.event({
             eventCategory: "geolocation",
-            eventAction: "has"
+            eventAction: "usingGeolocation",
+            eventValue: "usingGeolocation"
           });
 
           this.checkIfNaders(long, lat);
@@ -105,7 +106,8 @@ export default {
 
           this.$ga.event({
             eventCategory: "geolocation",
-            eventAction: "no"
+            eventAction: "notUsingGeoLocation",
+            eventValue: "notUsingGeoLocation"
           });
         }
       );
@@ -146,7 +148,8 @@ export default {
 
             this.$ga.event({
               eventCategory: "results",
-              eventAction: "warning"
+              eventAction: "warning",
+              eventValue: "warning"
             });
           } else {
             axios
@@ -170,14 +173,16 @@ export default {
 
                   this.$ga.event({
                     eventCategory: "results",
-                    eventAction: "watch"
+                    eventAction: "watch",
+                    eventValue: "watch"
                   });
                 } else {
                   this.description = "No tornados in your area.";
 
                   this.$ga.event({
                     eventCategory: "results",
-                    eventAction: "no tornado"
+                    eventAction: "no tornado",
+                    eventValue: "no tornado"
                   });
                 }
               })
