@@ -5,6 +5,7 @@ import router from './router'
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import VueAnalytics from 'vue-analytics'
+import VModal from 'vue-js-modal'
 
 require('dotenv').config();
 
