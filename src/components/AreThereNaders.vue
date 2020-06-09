@@ -20,22 +20,25 @@
         </div>
       </div>
     </div>
-    <div class="footer" v-if="formattedAddress && !isLoading">
-      <div>
-        Using address: 
-        <b>{{formattedAddress}}</b>
-        <br />
-        <i>
-          Not your address?
-          <a href="#" v-on:click="resetAddress()">
-            <span v-if="allowGeolocation">Try entering it manually</span>
-            <span v-else>Try entering it again</span>
-          </a>
-          <span v-if="allowGeolocation && !usingGeolocation">
-             - 
-            <a href="#" v-on:click="pullGeolocation()">Find me</a>
-          </span>
-        </i>
+    <div class="footer container-fluid" v-if="formattedAddress && !isLoading">
+      <div class="row">
+        <div class="col-sm-10 offset-sm-1">
+          Using address:
+          <b>{{formattedAddress}}</b>
+          <br />
+          <i>
+            Not your address?
+            <a href="#" v-on:click="resetAddress()">
+              <span v-if="allowGeolocation">Try entering it manually</span>
+              <span v-else>Try entering it again</span>
+            </a>
+            <span v-if="allowGeolocation && !usingGeolocation">
+              -
+              <a href="#" v-on:click="pullGeolocation()">Find me</a>
+            </span>
+          </i>
+        </div>
+        <send-feedback class="col-sm-1 mt-auto" color="#333" :email-config="emailConfig" />
       </div>
     </div>
   </div>
@@ -44,12 +47,14 @@
 <script>
 import axios from "axios";
 import GeocodingForm from "./GeocodingForm.vue";
+import SendFeedback from "./SendFeedback.vue";
 import * as opencage from "opencage-api-client";
 
 export default {
   name: "AreThereNaders",
   components: {
-    GeocodingForm
+    GeocodingForm,
+    SendFeedback
   },
   data() {
     return {
@@ -77,7 +82,11 @@ export default {
         "Reading the tarrot cards"
       ],
       startTime: null,
-      waitTime: 750 // ms
+      waitTime: 750, // ms
+      emailConfig: {
+        siteName: "AreThereNaders",
+        userId: process.env.VUE_APP_EMAIL_USER
+      }
     };
   },
   computed: {
@@ -92,7 +101,7 @@ export default {
     }
   },
   mounted() {
-      this.pullGeolocation();
+    this.pullGeolocation();
   },
   methods: {
     pullGeolocation() {
@@ -228,29 +237,35 @@ export default {
       let apiKey = process.env.VUE_APP_OPENCAGE;
       let query = encodeURI(lat + "+" + long);
 
-      axios.get(`https://api.opencagedata.com/geocode/v1/json?key=${apiKey}&q=${query}`)
-        .then((response) => {
+      axios
+        .get(
+          `https://api.opencagedata.com/geocode/v1/json?key=${apiKey}&q=${query}`
+        )
+        .then(response => {
           response = response.data;
-          if(response && response.results && response.results.length > 0 && response.results[0].formatted) {
-              this.formattedAddress = response.results[0].formatted;
+          if (
+            response &&
+            response.results &&
+            response.results.length > 0 &&
+            response.results[0].formatted
+          ) {
+            this.formattedAddress = response.results[0].formatted;
 
-              this.$ga.event({
-                eventCategory: 'reverseGeocode',
-                eventAction: 'good',
-                eventValue: 'good'
-              });
-
-              
+            this.$ga.event({
+              eventCategory: "reverseGeocode",
+              eventAction: "good",
+              eventValue: "good"
+            });
           } else {
-              console.error("Couldn't get reverseGeocoding");
+            console.error("Couldn't get reverseGeocoding");
 
-              this.$ga.event({
-                eventCategory: 'reverseGeocode',
-                eventAction: 'bad',
-                eventValue: 'bad'
-              });
+            this.$ga.event({
+              eventCategory: "reverseGeocode",
+              eventAction: "bad",
+              eventValue: "bad"
+            });
           }
-        })
+        });
     },
 
     doneLoading() {
