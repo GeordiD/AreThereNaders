@@ -163,6 +163,8 @@ export default {
     },
 
     checkIfNaders(long, lat) {
+      console.log('Checking for long/lat: ' + long + " / " + lat);
+      
       axios
         .get(
           "https://api.weather.gov/alerts?event=Tornado Warning&active=true&point=" +
@@ -186,7 +188,7 @@ export default {
           } else {
             axios
               .get(
-                "https://api.weather.gov/alerts?event=Tornado Watcg&active=true&point=" +
+                "https://api.weather.gov/alerts?event=Tornado Watch&active=true&point=" +
                   lat +
                   "," +
                   long
