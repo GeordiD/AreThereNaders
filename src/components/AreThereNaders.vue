@@ -1,17 +1,19 @@
 <template>
   <div class="page-container">
     <div class="pt-3 page-content">
-      <div v-if="error">Well, something broke. I'll try and fix it hang tight.</div>
-      <div v-else-if="isLoading">{{loadingMessage}}</div>
+      <div v-if="error">
+        Well, something broke. I'll try and fix it hang tight.
+      </div>
+      <div v-else-if="isLoading">{{ loadingMessage }}</div>
       <div v-else>
         <div id="are-there" v-if="hasLongLat">
-          <h1>{{areThere}}</h1>
+          <h1>{{ areThere }}</h1>
           <div>
             <div v-if="headline">
               <br />
-              <h4>{{headline}}</h4>
+              <h4>{{ headline }}</h4>
             </div>
-            <p>{{description}}</p>
+            <p>{{ description }}</p>
           </div>
         </div>
         <div v-else>
@@ -24,7 +26,7 @@
       <div class="row">
         <div class="col-sm-10 offset-sm-1">
           Using address:
-          <b>{{formattedAddress}}</b>
+          <b>{{ formattedAddress }}</b>
           <br />
           <i>
             Not your address?
@@ -38,23 +40,27 @@
             </span>
           </i>
         </div>
-        <send-feedback class="col-sm-1 mt-auto" color="#333" :email-config="emailConfig" />
+        <send-feedback
+          class="col-sm-1 mt-auto"
+          color="#333"
+          :email-config="emailConfig"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import GeocodingForm from "./GeocodingForm.vue";
-import SendFeedback from "./SendFeedback.vue";
-import * as opencage from "opencage-api-client";
+import axios from 'axios';
+import GeocodingForm from './GeocodingForm.vue';
+import SendFeedback from './SendFeedback.vue';
+import * as opencage from 'opencage-api-client';
 
 export default {
-  name: "AreThereNaders",
+  name: 'AreThereNaders',
   components: {
     GeocodingForm,
-    SendFeedback
+    SendFeedback,
   },
   data() {
     return {
@@ -68,40 +74,41 @@ export default {
       usingGeolocation: true,
       hasLongLat: true,
       isLoading: true,
-      loadingMessage: "loading...",
+      loadingMessage: 'loading...',
       loadingMessages: [
-        "Hacking NASA",
-        "Polling the guvment",
-        "Reading the Scrying Stones",
-        "Licking finger, holding it up to the sky, and waiting",
-        "Just a sec, lemme check from my porch",
-        "Smelling the air",
-        "Making you wait for no reason, suspense is fun",
-        "Calling memaw",
-        "Burning my essential oils",
-        "Reading the tarrot cards"
+        'Hacking NASA',
+        'Polling the guvment',
+        'Reading the Scrying Stones',
+        'Licking finger, holding it up to the sky, and waiting',
+        'Just a sec, lemme check from my porch',
+        'Smelling the air',
+        'Making you wait for no reason, suspense is fun',
+        'Calling memaw',
+        'Burning my essential oils',
+        'Reading the tarrot cards',
       ],
       startTime: null,
       waitTime: 750, // ms
       emailConfig: {
-        siteName: "AreThereNaders",
-        userId: process.env.VUE_APP_EMAIL_USER
-      }
+        siteName: 'AreThereNaders',
+        userId: process.env.VUE_APP_EMAIL_USER,
+      },
     };
   },
   computed: {
-    areThere: function() {
+    areThere: function () {
       if (this.isWarning) {
-        return "Yes.";
+        return 'Yes.';
       } else if (this.isWatch) {
-        return "Maybe.";
+        return 'Maybe.';
       } else {
-        return "Nope.";
+        return 'Nope.';
       }
-    }
+    },
   },
   mounted() {
     this.pullGeolocation();
+    console.log('v1.2');
   },
   methods: {
     pullGeolocation() {
@@ -114,11 +121,11 @@ export default {
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          position => {
+          (position) => {
             this.$ga.event({
-              eventCategory: "geolocation",
-              eventAction: "usingGeolocation",
-              eventValue: "usingGeolocation"
+              eventCategory: 'geolocation',
+              eventAction: 'usingGeolocation',
+              eventValue: 'usingGeolocation',
             });
 
             long = position.coords.longitude;
@@ -131,13 +138,16 @@ export default {
           },
           () => {
             // we'll have to get it some other way
-            this.usingGeolocation = this.allowGeolocation = this.hasLongLat = false;
+            this.usingGeolocation =
+              this.allowGeolocation =
+              this.hasLongLat =
+                false;
             this.isLoading = false;
 
             this.$ga.event({
-              eventCategory: "geolocation",
-              eventAction: "notUsingGeoLocation",
-              eventValue: "notUsingGeoLocation"
+              eventCategory: 'geolocation',
+              eventAction: 'notUsingGeoLocation',
+              eventValue: 'notUsingGeoLocation',
             });
           }
         );
@@ -163,16 +173,16 @@ export default {
     },
 
     checkIfNaders(long, lat) {
-      console.log('Checking for long/lat: ' + long + " / " + lat);
-      
+      console.log('Checking for long/lat: ' + long + ' / ' + lat);
+
       axios
         .get(
-          "https://api.weather.gov/alerts?event=Tornado Warning&active=true&point=" +
+          'https://api.weather.gov/alerts?event=Tornado Warning&active=true&point=' +
             lat +
-            "," +
+            ',' +
             long
         )
-        .then(res => {
+        .then((res) => {
           if (res.data && res.data.features && res.data.features.length > 0) {
             this.isWarning = true;
             this.isWatch = false;
@@ -181,19 +191,19 @@ export default {
             this.doneLoading();
 
             this.$ga.event({
-              eventCategory: "results",
-              eventAction: "warning",
-              eventValue: "warning"
+              eventCategory: 'results',
+              eventAction: 'warning',
+              eventValue: 'warning',
             });
           } else {
             axios
               .get(
-                "https://api.weather.gov/alerts?event=Tornado Watch&active=true&point=" +
+                'https://api.weather.gov/alerts?event=Tornado Watch&active=true&point=' +
                   lat +
-                  "," +
+                  ',' +
                   long
               )
-              .then(res => {
+              .then((res) => {
                 if (
                   res.data &&
                   res.data.features &&
@@ -206,21 +216,21 @@ export default {
                     res.data.features[0].properties.description;
 
                   this.$ga.event({
-                    eventCategory: "results",
-                    eventAction: "watch",
-                    eventValue: "watch"
+                    eventCategory: 'results',
+                    eventAction: 'watch',
+                    eventValue: 'watch',
                   });
                 } else {
-                  this.description = "No tornados in your area.";
+                  this.description = 'No tornados in your area.';
 
                   this.$ga.event({
-                    eventCategory: "results",
-                    eventAction: "no tornado",
-                    eventValue: "no tornado"
+                    eventCategory: 'results',
+                    eventAction: 'no tornado',
+                    eventValue: 'no tornado',
                   });
                 }
               })
-              .catch(err => {
+              .catch((err) => {
                 this.error = true;
                 console.error(err);
               })
@@ -229,7 +239,7 @@ export default {
               });
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.error = true;
           console.error(err);
         });
@@ -237,13 +247,13 @@ export default {
 
     reverseGeocode(long, lat) {
       let apiKey = process.env.VUE_APP_OPENCAGE;
-      let query = encodeURI(lat + "+" + long);
+      let query = encodeURI(lat + '+' + long);
 
       axios
         .get(
           `https://api.opencagedata.com/geocode/v1/json?key=${apiKey}&q=${query}`
         )
-        .then(response => {
+        .then((response) => {
           response = response.data;
           if (
             response &&
@@ -254,17 +264,17 @@ export default {
             this.formattedAddress = response.results[0].formatted;
 
             this.$ga.event({
-              eventCategory: "reverseGeocode",
-              eventAction: "good",
-              eventValue: "good"
+              eventCategory: 'reverseGeocode',
+              eventAction: 'good',
+              eventValue: 'good',
             });
           } else {
             console.error("Couldn't get reverseGeocoding");
 
             this.$ga.event({
-              eventCategory: "reverseGeocode",
-              eventAction: "bad",
-              eventValue: "bad"
+              eventCategory: 'reverseGeocode',
+              eventAction: 'bad',
+              eventValue: 'bad',
             });
           }
         });
@@ -280,8 +290,8 @@ export default {
       } else {
         this.isLoading = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
