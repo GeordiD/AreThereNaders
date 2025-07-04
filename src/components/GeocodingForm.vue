@@ -104,7 +104,7 @@
           type="submit"
           class="btn btn-primary mx-auto"
           :disabled="submitStatus === 'PENDING'"
-        >But are there 'naders?</button>
+        >But are there tornadoes?</button>
         <div
           class="alert alert-danger mt-3"
           v-if="submitStatus === 'ERROR'"
@@ -120,8 +120,8 @@
 
 <script>
 import * as opencage from "opencage-api-client";
-import { required, minLength, maxLength } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
+import { maxLength, minLength, required } from "vuelidate/lib/validators";
 
 export default {
   name: "GeocodingForm",
